@@ -13,5 +13,5 @@ public interface RoleService {
 
 	public RoleFinalResponseDto getRole(String roleCode);
 
-	public RoleResponseListDto getRoles(String status, Integer statusCode, String message);
+	public RoleResponseListDto getRoles(String status, Integer statusCode, String message, int pageNumber, int size, String sortBy);
 }

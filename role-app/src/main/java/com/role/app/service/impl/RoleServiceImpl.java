@@ -4,6 +4,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.role.app.constants.RoleConstants;
@@ -31,10 +35,10 @@ public class RoleServiceImpl implements RoleService{
 			roleEntity = roleHelper.convertToTargetObject(RoleEntity.class, roleRequestDto);
 			roleRepo.save(roleEntity);
 			roleResponseListDto = getRoles(RoleConstants.ADD_ROLE_SUCCESS_STATUS, RoleConstants.ADD_ROLE_SUCCESS_STATUS_CODE, 
-					RoleConstants.ADD_ROLE_SUCCESS_MESSAGE);			
+					RoleConstants.ADD_ROLE_SUCCESS_MESSAGE, 0, 5, "roleCode");			
 		}else {
 			roleResponseListDto = getRoles(RoleConstants.DATA_EXIST_STATUS, 
-					RoleConstants.DATA_EXIST_STATUS_CODE, RoleConstants.DATA_EXIST_MESSAGE+roleRequestDto.getRoleCode());			
+					RoleConstants.DATA_EXIST_STATUS_CODE, RoleConstants.DATA_EXIST_MESSAGE+roleRequestDto.getRoleCode(), 0, 5, "roleCode");			
 		}
 		return roleResponseListDto;
 	}
@@ -48,10 +52,10 @@ public class RoleServiceImpl implements RoleService{
 			roleEntity.setRoleName(roleRequestDto.getRoleName());
 			roleRepo.save(roleEntity);
 			roleResponseListDto = getRoles(RoleConstants.UPDATE_ROLE_SUCCESS_STATUS, RoleConstants.UPDATE_ROLE_SUCCESS_STATUS_CODE, 
-					RoleConstants.UPDATE_ROLE_SUCCESS_MESSAGE+roleRequestDto.getRoleCode());
+					RoleConstants.UPDATE_ROLE_SUCCESS_MESSAGE+roleRequestDto.getRoleCode(), 0, 5, "roleCode");
 		}else {
 			roleResponseListDto = getRoles(RoleConstants.NO_DATA_STATUS, 
-					RoleConstants.NO_DATA_STATUS_CODE, RoleConstants.NO_DATA_MESSAGE+roleRequestDto.getRoleCode());
+					RoleConstants.NO_DATA_STATUS_CODE, RoleConstants.NO_DATA_MESSAGE+roleRequestDto.getRoleCode(), 0, 5, "roleCode");
 		}
 		return roleResponseListDto;
 	}
@@ -63,10 +67,10 @@ public class RoleServiceImpl implements RoleService{
 		if(roleEntity != null) {
 			roleRepo.delete(roleEntity);
 			roleResponseListDto = getRoles(RoleConstants.DELETE_ROLE_SUCCESS_STATUS, RoleConstants.DELETE_ROLE_SUCCESS_STATUS_CODE, 
-					RoleConstants.DELETE_ROLE_SUCCESS_MESSAGE+roleCode);
+					RoleConstants.DELETE_ROLE_SUCCESS_MESSAGE+roleCode, 0, 5, "roleCode");
 		}else {
 			roleResponseListDto = getRoles(RoleConstants.NO_DATA_STATUS, 
-					RoleConstants.NO_DATA_STATUS_CODE, RoleConstants.NO_DATA_MESSAGE+roleCode);
+					RoleConstants.NO_DATA_STATUS_CODE, RoleConstants.NO_DATA_MESSAGE+roleCode, 0, 5, "roleCode");
 		}
 		return roleResponseListDto;
 	}
@@ -89,12 +93,15 @@ public class RoleServiceImpl implements RoleService{
 	}
 
 	@Override
-	public RoleResponseListDto getRoles(String status, Integer statusCode, String message) {
-		List<RoleEntity> roleEntities = roleRepo.findAll();
-		List<RoleResponseDto> roleResponseDtos = roleEntities.stream()
+	public RoleResponseListDto getRoles(String status, Integer statusCode, String message, int pageNumber, int size, String sortBy) {
+		Pageable pageable = PageRequest.of(pageNumber, size, Sort.by(sortBy));
+		Page<RoleEntity> page = roleRepo.findAll(pageable);	
+		List<RoleResponseDto> roleResponseDtos = page.stream()
 				.map(re -> roleHelper.convertToTargetObject(RoleResponseDto.class, re)).collect(Collectors.toList());
 		RoleResponseListDto roleResponseListDto = new RoleResponseListDto();
 		roleResponseListDto.setRoleResponseDtos(roleResponseDtos);
+		roleResponseListDto.setTotalPages(page.getTotalPages());
+		roleResponseListDto.setTotalElements(page.getTotalElements());
 		if(roleResponseDtos.isEmpty() && status == null && statusCode == null && message == null) {
 			status = RoleConstants.NO_DATA_STATUS;
 			statusCode = RoleConstants.NO_DATA_STATUS_CODE;

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.role.app.constants.PathConstants;
@@ -47,8 +48,9 @@ public class RoleController {
 	}
 	
 	@GetMapping
-	public ResponseEntity<RoleResponseListDto> getRoles() {
-		return new ResponseEntity<>(roleService.getRoles(null, null, null), HttpStatus.OK);
+	public ResponseEntity<RoleResponseListDto> getRoles(@RequestParam(defaultValue = "0", value = "page") Integer pageNumber, 
+			@RequestParam(defaultValue = "5", value = "size") Integer size, @RequestParam(defaultValue = "roleCode", value = "sort-by") String sortBy) {
+		return new ResponseEntity<>(roleService.getRoles(null, null, null, pageNumber, size, sortBy), HttpStatus.OK);
 	}
 
 }
