@@ -8,6 +8,15 @@ public class RoleResponseListDto {
 	private Notification notification;
 	private Integer totalPages;
 	private Long totalElements;
+	private Integer currentPage;
+
+	public Integer getCurrentPage() {
+		return currentPage;
+	}
+
+	public void setCurrentPage(Integer currentPage) {
+		this.currentPage = currentPage;
+	}
 
 	public Integer getTotalPages() {
 		return totalPages;

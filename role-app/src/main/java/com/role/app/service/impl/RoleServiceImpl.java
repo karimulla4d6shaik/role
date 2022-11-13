@@ -102,6 +102,7 @@ public class RoleServiceImpl implements RoleService{
 		roleResponseListDto.setRoleResponseDtos(roleResponseDtos);
 		roleResponseListDto.setTotalPages(page.getTotalPages());
 		roleResponseListDto.setTotalElements(page.getTotalElements());
+		roleResponseListDto.setCurrentPage(pageable.getPageNumber());
 		if(roleResponseDtos.isEmpty() && status == null && statusCode == null && message == null) {
 			status = RoleConstants.NO_DATA_STATUS;
 			statusCode = RoleConstants.NO_DATA_STATUS_CODE;
